@@ -1,50 +1,29 @@
-# (!c) petter wahlman
-#
-CC      = gcc
-
-SRCDIR  = ./src
-OBJDIR  = ./obj
-BINDIR  = ./bin
-INCLUDE = ./include
-
-BINARY  = $(BINDIR)/kcache
-
-CFLAGS  = -I $(INCLUDE) -g -Wall
+CC = gcc
+uname_s = $(shell uname -s)
+TARGET = kcache
 LDFLAGS = -lcrypto
+INSTALL_DIR = /usr/local/bin/
 
-VPATH   = $(SRCDIR)
+all : $(TARGET)
 
-BINARY_OBJ = \
-	$(OBJDIR)/kcache.o \
-	$(OBJDIR)/crypto.o \
-	$(OBJDIR)/util.o \
-	$(OBJDIR)/lzss.o
+$(TARGET) : src/kcache.o src/crypto.o src/lzss.o src/util.o
+	$(CC) -o $(TARGET) src/kcache.o src/crypto.o src/lzss.o src/util.o $(LDFLAGS)
+	@echo "Successfully built $(TARGET) for $(uname_s)"
 
-$(OBJDIR)/%.o: %.c
-	$(CC) -c $< $(CFLAGS) -o $@
+kcache.o : src/kcache.c
+	$(CC) -c src/kcache.c -o src/kcache.o
 
-.PHONY:
-all:    make_dirs $(BINARY) install
+crypto.o : src/crypto.c
+	$(CC) -c src/crypto.c -o src/crypto.o
 
-$(BINARY): $(BINARY_OBJ)
-	$(CC) -o $@ $^ $(LDFLAGS) 
+lzss.o : src/lzss.c
+	$(CC) -c src/lzss.c -o src/lzss.o
 
-.PHONY:
-clean:
-	@rm -rvf \
-		$(BINARY) \
-		$(BINARY_OBJ)
-	@-ls ./kcache/*kernelcache.* |grep -v release | xargs rm -v
+util.o : src/util.c
+	$(CC) -c src/lzss.c -o src/lzss.o
 
-.PHONY:
-make_dirs:
-	@mkdir -p $(OBJDIR) $(BINDIR)
+clean :
+	rm -rf src/*.o $(TARGET)
 
-.PHONY:
-install:
-	@if [ -d ~/bin ]; then \
-		install $(BINARY) ~/bin; \
-	else \
-		sudo install $(BINARY) /usr/local/bin; \
-	fi 
-
+install :
+	cp $(TARGET) $(INSTALL_DIR)

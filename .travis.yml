@@ -1,0 +1,11 @@
+#This file is used to configure travis-ci build
+os :
+  - linux
+
+language: C
+sudo: false
+
+compiler:
+  - gcc
+
+script : make

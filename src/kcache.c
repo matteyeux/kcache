@@ -37,22 +37,20 @@ int opt_decomp = 1;
 int opt_strip = 1;
 
 
-void print_usage(void)
-{
-    printf("usage: img3 [option(s)]\n"
-           "    -h,  --help                 this information\n"
-           "    -i,  --in <filename>        input file (default ./kcache/kernelcache.release.n90,\n"
-           "                                or ./kcache/kernelcache.bin if --encrypt is supplied)\n"
-           "    -w,  --wd <directory>       work directory (default ./kcache)\n"
-           "    -k,  --key <key>            AES key\n"
-           "    -v,  --iv  <iv>             AES init vector\n"
-           "    -e,  --encrypt              encrypt data (inverse of default)\n"
-           // don't use these flags unless you know what you are doing:
-           //"    -e,  --encrypt              encrypt data\n"
-           //"    -c,  --compress             compress data\n"
-           //"    -D,  --nodecompess          don't decompress lzss container\n"
-           //"    -S,  --nostrip              don't strip lzss header\n"
-           );
+void usage(int argc, char *argv[])
+{   
+    char *name = NULL;
+    name = strrchr(argv[0], '/');
+    printf("usage: %s <input> [OPTIONS]\n",(name ? name + 1: argv[0]));
+    printf("-i, --in <filename>\n"); //input file (default ./kcache/kernelcache.release.n90, or ./kcache/kernelcache.bin if --encrypt is supplied
+    printf("-w, --wd <directory>\n"); // work directory (default kcache_output)
+    printf("-k, --key <key>\tAES key\n");
+    printf("-v, --iv  <iv>\tAES init vector\n");
+    /*don't use these flags unless you know what you are doing:
+    printf("-e, --encrypt\tencrypt data\n");
+    printf("-c, --compress\tcompress data\n");
+    printf("-D, --nodecompess\tdon't decompress lzss container\n");
+    printf("-S, --nostrip\tdon't strip lzss header\n");*/
 }
 
 struct tag *find_tag(unsigned char *data, unsigned int len, char *tagname)
@@ -217,7 +215,7 @@ int kcache_encrypt(char *in, char *wd, unsigned char *iv, unsigned char *key)
     free(buf); buf = NULL;
 
     printf("locating data tag:\n");
-    printf("opening:     %s/kernelcache.release.n90\n", wd);
+    printf("opening:     %s/%s\n", wd, in);
     fd = open("./kernelcache.release.n90", O_RDONLY);
     if (-1 == fd) {
         fprintf(stderr, "error, unable to open %s: %s\n", in, strerror(errno));
@@ -259,7 +257,7 @@ int kcache_encrypt(char *in, char *wd, unsigned char *iv, unsigned char *key)
 // decrypt and uncompress
 // TODO: add contentsize, not img?
 int kcache_decrypt(char *in, char *wd, unsigned char *iv, unsigned char *key)
-{
+{   
     unsigned char *plaintext;
     unsigned char *data;
     unsigned char *ptr;
@@ -268,7 +266,6 @@ int kcache_decrypt(char *in, char *wd, unsigned char *iv, unsigned char *key)
     struct tag *tag;
     FILE *fp;
     int fd;
-
     // open input file:
     printf("opening:     %s\n", in);
     fd = open(in, O_RDONLY);
@@ -361,7 +358,7 @@ end:
 int main(int argc, char **argv)
 {
     char *in;
-    char *wd;
+    char *wd = "kcache_outputs";
     unsigned char iv[] = {  
         0x30, 0x1c, 0x0d, 0xb0, 0xf6, 0xfc, 0x3a, 0x92,
         0xc3, 0x4f, 0x34, 0xb2, 0xdf, 0xf5, 0xd9, 0x2f};
@@ -388,6 +385,11 @@ int main(int argc, char **argv)
             { "nostrip",  0, 0, 'S' },
             { NULL,       0, 0,  0  }
         };
+        if (argc < 2)
+        {
+            usage(argc, argv);
+            return 0;
+        }
 
         c = getopt_long(argc, argv, "hi:w:k:v:ecDS", long_options, &option_index);
         if (-1 == c)
@@ -395,7 +397,7 @@ int main(int argc, char **argv)
 
         switch (c) {
             case 'h':
-                print_usage();
+                usage(argc, argv);
                 exit(0);
             case 'i':
                 in = strdup(optarg);
@@ -457,7 +459,7 @@ int main(int argc, char **argv)
         char *tmp = strdup(in);
         //in = "./kcache/kernelcache.release.n90";
         //wd = "./kcache";
-        asprintf(&wd, "%s/kcache", dirname(tmp));
+        asprintf(&wd, "%s/kcache_outputs", dirname(tmp));
         free(tmp);
         mkdir(wd, 0755);
 

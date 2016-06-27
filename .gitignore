@@ -1,0 +1,4 @@
+kcache
+src/*.o
+kcache_outputs
+kernelcache*
