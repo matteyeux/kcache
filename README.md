@@ -67,8 +67,8 @@ creating:    ./kcache_outputs/kernelcache.bin
 
 ### TODO
 
-- Add im4p support
-- Test kcache on macOS/OSX
+- Add im4p support 
+- Test kcache on macOS/OSX (and iOS)
 
 ###  Installation
 
