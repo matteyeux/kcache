@@ -2,3 +2,5 @@ kcache
 src/*.o
 kcache_outputs
 kernelcache*
+test.c
+a.out

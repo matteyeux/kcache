@@ -90,6 +90,31 @@ struct tag *find_tag(unsigned char *data, unsigned int len, char *tagname)
     return NULL;
 }
 
+int check4im4p (int argc, char *argv[])
+{
+    char begin_file[12];
+    char filetype[5];
+    int nb;
+    int fd=0;
+    memset(begin_file, 0, 12);
+    memset(filetype, 0, 5);
+    fd = open(argv[2], O_RDONLY);
+    if (fd == -1)
+    {
+        printf("Could not open %s\n", argv[2]);
+        exit(1);
+    }
+    nb = read(fd, begin_file, 11);
+    strncpy(filetype, begin_file+7, 4);
+    if(strcmp(filetype, "IM4P")==0)
+    {
+        printf("This tool doesn't support IM4P files\n");
+        exit(1);
+    }
+    close(fd);
+    return 0;
+}
+
 // todo: consider creating dest. directories
 int copy_file(char *src, char *dst, mode_t mode)
 {
@@ -432,6 +457,8 @@ int main(int argc, char **argv)
         fprintf(stderr, "error, no input file specified\n");
         return 1;
     }
+
+    check4im4p(argc, argv);
 
     if (opt_decomp && opt_compress) {
         fprintf(stderr, "error, --decompress and --compress are mutually exclusive\n");
