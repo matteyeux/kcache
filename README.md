@@ -1,5 +1,5 @@
 # Kcache
-
+[![Build Status](https://travis-ci.org/matteyeux/kcache.svg?branch=master)](https://travis-ci.org/matteyeux/kcache)     
 Kcache is a kernelcache encrypt/decrypt utility, you can use it to decrypt iOS kernelcache.
 
 ```
