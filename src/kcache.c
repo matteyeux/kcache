@@ -90,7 +90,7 @@ struct tag *find_tag(unsigned char *data, unsigned int len, char *tagname)
     return NULL;
 }
 
-int check4im4p (int argc, char *argv[])
+int check4im4p (char *in)
 {
     char begin_file[12];
     char filetype[5];
@@ -98,10 +98,10 @@ int check4im4p (int argc, char *argv[])
     int fd=0;
     memset(begin_file, 0, 12);
     memset(filetype, 0, 5);
-    fd = open(argv[2], O_RDONLY);
+    fd = open(in, O_RDONLY);
     if (fd == -1)
     {
-        printf("Could not open %s\n", argv[2]);
+        printf("Could not open %s\n", in);
         exit(1);
     }
     nb = read(fd, begin_file, 11);
@@ -458,7 +458,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    check4im4p(argc, argv);
+    check4im4p(in);
 
     if (opt_decomp && opt_compress) {
         fprintf(stderr, "error, --decompress and --compress are mutually exclusive\n");
